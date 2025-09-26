@@ -9,7 +9,9 @@ _LOCAL/
 /data
 /*.log
 /src/kleinanzeigen_bot/_version.py
-downloaded-ads
+KleinManager2.code-workspace
+
+
 
 # python
 /.venv

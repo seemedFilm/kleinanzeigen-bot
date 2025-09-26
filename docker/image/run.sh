@@ -6,7 +6,7 @@
 set -e -u
 
 ##############################
-# execute script with bash if loaded with other shell interpreter
+# execute script with bash if loaded with other shell interprfter
 ##############################
 if [ -z "${BASH_VERSINFO:-}" ]; then /usr/bin/env bash "$0" "$@"; exit; fi
 
@@ -20,4 +20,5 @@ fi
 
 cd /mnt/data
 
+/opt/start_chromium.sh
 /opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"

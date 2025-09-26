@@ -25,11 +25,11 @@ RUN <<EOF
   echo "#################################################"
   echo "Installing root CAs..."
   echo "#################################################"
-  apt-get install --no-install-recommends -y ca-certificates
+  apt-get install --no-install-recommends -y ca-certificates curl
   update-ca-certificates
 
   echo "#################################################"
-  echo "Installing Chromium..."
+  echo "Installing Chromium... & pwuser for starting chromium as non-root user"
   echo "#################################################"
   apt-get install --no-install-recommends -y chromium
 
@@ -40,6 +40,8 @@ RUN <<EOF
     /var/lib/apt/lists/* \
     /var/log/{apt,alternatives.log,bootstrap.log,dpkg.log} \
     /tmp/* /var/tmp/*
+
+  useradd -ms /bin/bash pwuser 
 
 EOF
 
@@ -94,16 +96,20 @@ RUN /opt/app/dist/kleinanzeigen-bot --help
 ######################
 # final image
 ######################
+# Basis-Image laden
 FROM runtime-base-image
+
+# Binärdateien/Artefakte vom Build-Image kopieren
 COPY --from=build-image /opt/app/dist/kleinanzeigen-bot /opt/kleinanzeigen-bot
 
+# ---- Build Args (werden von update_env.sh gesetzt) ----
 ARG BUILD_DATE
 ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
 
-LABEL \
-  maintainer="Sebastian Thomschke" \
+# ---- Labels für Metadaten ----
+LABEL maintainer="Sebastian Thomschke" \
   org.label-schema.schema-version="1.0" \
   org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-ref=$GIT_COMMIT_HASH \
@@ -114,16 +120,39 @@ LABEL \
   org.opencontainers.image.title="kleinanzeigen-bot" \
   org.opencontainers.image.description="CLI application to ease publishing of ads to kleinanzeigen.de"
 
-# https://stackoverflow.com/a/59812588/5116073
 ENV PYTHONUNBUFFERED=1
-ENV DISPLAY=0:0
+ENV DISPLAY=":0"
+ENV X11_DISPLAY=":0"
+ENV KLEINBOT_NAME="kleinbot"
+ENV KLEINBOT_LOGS="/klein/bot/data/logs"
+ENV KLEINBOT_CACHE="/klein/bot/cache"
+ENV KLEINBOT_DATA="/klein/bot/data"
+ENV SHARED_ADS="/klein/shared/ads"
+ENV SHARED_PIC="/klein/shared/pics"
+ENV LOGGING_ENABLE="TRUE"
+# ---- Default Configs ----
+ENV INIT_SH_FILE='' \
+    CONFIG_FILE=/mnt/data/config.yaml
+
+# ---- Entry Point ----
+
+RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
+RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
+RUN bash
+
+
+COPY docker/image/run.sh /opt/run.sh
+#copy chromium start script and make it executable
+COPY docker/image/start_chromium.sh /opt/start_chromium.sh
+RUN chmod +x /opt/start_chromium.sh
+
+
+VOLUME /mnt/data
+VOLUME /mnt/data/ads
+VOLUME /mnt/data/ads/pics
+VOLUME /mnt/data/cache
 
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
 
-ENV \
-  INIT_SH_FILE='' \
-  CONFIG_FILE=/mnt/data/config.yaml
 
-COPY docker/image/run.sh /opt/run.sh
 
-VOLUME /mnt/data
