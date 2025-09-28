@@ -1424,30 +1424,31 @@ def main(args:list[str]) -> None:
     #    We now handle exceptions explicitly using a top-level try/except block.
 
     atexit.register(loggers.flush_all_handlers)
-
     try:
         bot = KleinanzeigenBot()
         atexit.register(bot.close_browser_session)
-    # --------- HIER EINFÜGEN ----------
-        cookie_file = os.getenv("KLEINBOT_COOKIE")
-        if cookie_file:
-            if not os.path.isabs(cookie_file):
-                cookie_file = os.path.join(os.getcwd(), cookie_file)
-            if os.path.exists(cookie_file):
-                # Wenn du in deiner config einen browser.user_data_dir gesetzt hast,
-                # übergib den gleichen Pfad hier — sonst wird das Default-Profil benutzt.
-                user_data_dir = None
-                # Beispiel: falls dein bot/config die Browser-User-Dir konfiguriert
-                try:
-                    # passe ggf. an: wo dein config-objekt liegt (dies ist ein Beispiel)
-                    user_data_dir = getattr(bot, "config", {}).get("browser", {}).get("user_data_dir")
-                except Exception:
+        if os.getenv("TEST", "").lower() == "true":
+            # --------- HIER EINFÜGEN ----------
+            cookie_file = os.getenv("KLEINBOT_COOKIE")
+            if cookie_file:
+                if not os.path.isabs(cookie_file):
+                    cookie_file = os.path.join(os.getcwd(), cookie_file)
+                if os.path.exists(cookie_file):
+                    # Wenn du in deiner config einen browser.user_data_dir gesetzt hast,
+                    # übergib den gleichen Pfad hier — sonst wird das Default-Profil benutzt.
                     user_data_dir = None
+                    # Beispiel: falls dein bot/config die Browser-User-Dir konfiguriert
+                    try:
+                        # passe ggf. an: wo dein config-objekt liegt (dies ist ein Beispiel)
+                        user_data_dir = getattr(bot, "config", {}).get("browser", {}).get("user_data_dir")
+                    except Exception:
+                        user_data_dir = None
 
-                _import_cookies_into_nodriver(cookie_file, user_data_dir=user_data_dir)
-            else:
-                LOG.warning("KLEINBOT_COOKIE gesetzt, Datei nicht gefunden: %s", cookie_file)
-        # -----------------------------------
+                    _import_cookies_into_nodriver(cookie_file, user_data_dir=user_data_dir)
+                else:
+                    LOG.warning("KLEINBOT_COOKIE gesetzt, Datei nicht gefunden: %s", cookie_file)
+            # -----------------------------------
+        
         nodriver.loop().run_until_complete(bot.run(args))
     except CaptchaEncountered as ex:
         raise ex
