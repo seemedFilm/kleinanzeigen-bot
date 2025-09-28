@@ -107,6 +107,7 @@ ARG BUILD_DATE
 ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
+ARG KLEINBOT_COOKIE
 
 # ---- Labels für Metadaten ----
 LABEL maintainer="Sebastian Thomschke" \
@@ -127,6 +128,7 @@ ENV KLEINBOT_NAME="kleinbot"
 ENV KLEINBOT_LOGS="/klein/bot/data/logs"
 ENV KLEINBOT_CACHE="/klein/bot/cache"
 ENV KLEINBOT_DATA="/klein/bot/data"
+ENV KLEINBOT_COOKIE="/klein/bot/data/kleinanzeigen_cookies.json"
 ENV SHARED_ADS="/klein/shared/ads"
 ENV SHARED_PIC="/klein/shared/pics"
 ENV LOGGING_ENABLE="TRUE"
@@ -148,9 +150,9 @@ RUN chmod +x /opt/start_chromium.sh
 
 
 VOLUME /mnt/data
-VOLUME /mnt/data/ads
-VOLUME /mnt/data/ads/pics
-VOLUME /mnt/data/cache
+#VOLUME /mnt/data/ads
+#VOLUME /mnt/data/ads/pics
+#VOLUME /mnt/data/cache
 
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
 

@@ -30,6 +30,63 @@ LOG.setLevel(loggers.INFO)
 
 colorama.just_fix_windows_console()
 
+def _import_cookies_into_nodriver(cookie_file: str, user_data_dir: str | None = None) -> None:
+    """
+    Startet kurz nodriver (mit optionalem user_data_dir), lÃ¤dt die cookie-JSON
+    und schreibt die Cookies in das Browser-Profil.
+    cookie_file: Pfad zur JSON-Datei (Liste von Cookie-Dicts: name/value/domain/path/secure/httpOnly/expires)
+    user_data_dir: optionaler Pfad zum Browser-Profil (wichtig: muss mit dem Profil Ã¼bereinstimmen, das der Bot spÃ¤ter verwendet)
+    """
+    try:
+        import nodriver
+        from nodriver.cdp.network import CookieParam
+    except Exception as exc:
+        LOG.warning("nodriver nicht verfÃ¼gbar: %s â€” Cookies werden nicht importiert", exc)
+        return
+
+    async def _task():        
+        browser = await nodriver.start(user_data_dir=user_data_dir)
+        try:
+            page = await browser.get("https://www.kleinanzeigen.de/")
+            with open(cookie_file, "r", encoding="utf-8") as fh:
+                cookies = json.load(fh)
+
+            params = []
+            for c in cookies:
+                cj = {
+                    "domain": c.get("domain"),
+                    "name": c.get("name"),
+                    "value": c.get("value"),                    
+                    "path": c.get("path", "/"),
+                    "samesite": c.get("sameSite", "-1"),
+                    "secure": bool(c.get("secure", False)),
+                    "httpOnly": bool(c.get("httpOnly", False))
+                }
+                if c.get("expires") is not None:
+                    try:
+                        cj["expires"] = int(c.get("expires"))
+                    except Exception:
+                        pass
+                params.append(CookieParam.from_json(cj))
+
+            await browser.cookies.set_all(cookies=params)
+
+            await page.reload()
+        finally:
+            try:
+                await browser.close()
+            except Exception:
+                # still try to stop cleanly
+                try:
+                    browser.stop()
+                except Exception:
+                    pass
+    # execute in the existing nodriver loop synchronously (main() ist nicht async)
+    try:
+        nodriver.loop().run_until_complete(_task())
+    except Exception as exc:
+        LOG.warning("Fehler beim Import der Cookies: %s", exc)
+
 
 class AdUpdateStrategy(enum.Enum):
     REPLACE = enum.auto()
@@ -1371,6 +1428,26 @@ def main(args:list[str]) -> None:
     try:
         bot = KleinanzeigenBot()
         atexit.register(bot.close_browser_session)
+    # --------- HIER EINFÜGEN ----------
+        cookie_file = os.getenv("KLEINBOT_COOKIE")
+        if cookie_file:
+            if not os.path.isabs(cookie_file):
+                cookie_file = os.path.join(os.getcwd(), cookie_file)
+            if os.path.exists(cookie_file):
+                # Wenn du in deiner config einen browser.user_data_dir gesetzt hast,
+                # übergib den gleichen Pfad hier — sonst wird das Default-Profil benutzt.
+                user_data_dir = None
+                # Beispiel: falls dein bot/config die Browser-User-Dir konfiguriert
+                try:
+                    # passe ggf. an: wo dein config-objekt liegt (dies ist ein Beispiel)
+                    user_data_dir = getattr(bot, "config", {}).get("browser", {}).get("user_data_dir")
+                except Exception:
+                    user_data_dir = None
+
+                _import_cookies_into_nodriver(cookie_file, user_data_dir=user_data_dir)
+            else:
+                LOG.warning("KLEINBOT_COOKIE gesetzt, Datei nicht gefunden: %s", cookie_file)
+        # -----------------------------------
         nodriver.loop().run_until_complete(bot.run(args))
     except CaptchaEncountered as ex:
         raise ex

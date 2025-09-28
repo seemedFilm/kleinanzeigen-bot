@@ -6,7 +6,7 @@
 set -e -u
 
 ##############################
-# execute script with bash if loaded with other shell interprfter
+# execute script with bash if loaded with other shell interpreter
 ##############################
 if [ -z "${BASH_VERSINFO:-}" ]; then /usr/bin/env bash "$0" "$@"; exit; fi
 
