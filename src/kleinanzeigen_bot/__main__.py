@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-ArtifactOfProjectHomePage: https://github.com/Second-Hand-Friends/kleinanzeigen-bot/
 import sys, time # isort: skip
-import os
-#from .utils.cookies import import_cookies
-import nodriver
 from nodriver.cdp.network import CookieParam
 from gettext import gettext as _
 

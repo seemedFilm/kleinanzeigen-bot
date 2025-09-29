@@ -150,9 +150,9 @@ RUN chmod +x /opt/start_chromium.sh
 
 
 VOLUME /mnt/data
-#VOLUME /mnt/data/ads
-#VOLUME /mnt/data/ads/pics
-#VOLUME /mnt/data/cache
+VOLUME /mnt/data/ads
+VOLUME /mnt/data/ads/pics
+VOLUME /mnt/data/cache
 
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
 

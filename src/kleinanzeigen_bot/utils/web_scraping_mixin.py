@@ -5,6 +5,11 @@ import asyncio, enum, inspect, json, os, platform, secrets, shutil, subprocess, 
 from collections.abc import Callable, Coroutine, Iterable
 from gettext import gettext as _
 from typing import Any, Final, cast
+#pl
+from kleinanzeigen_bot.utils.cookies import import_cookies_into_page
+
+
+
 
 try:
     from typing import Never  # type: ignore[attr-defined,unused-ignore] # mypy
@@ -673,6 +678,9 @@ class WebScrapingMixin:
             LOG.debug("  => skipping, [%s] is already open", url)
             return
         self.page = await self.browser.get(url = url, new_tab = False, new_window = False)
+        #pl
+        await import_cookies_into_page(self.browser, self.page)
+
         await self.web_await(lambda: self.web_execute("document.readyState == 'complete'"), timeout = timeout,
                 timeout_error_message = f"Page did not finish loading within {timeout} seconds.")
 
