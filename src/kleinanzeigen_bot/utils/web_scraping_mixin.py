@@ -569,20 +569,32 @@ class WebScrapingMixin:
 
         return result
 
-    async def web_find(self, selector_type:By, selector_value:str, *, parent:Element | None = None, timeout:int | float = 5) -> Element:
+    async def web_find(
+        self,
+        selector_type: By,
+        selector_value: str,
+        *,
+        parent: Element | None = None,
+        timeout: int | float = 5,
+        ) -> Element:
         """
         Locates an HTML element by the given selector type and value.
+
 
         :param timeout: timeout in seconds
         :raises TimeoutError: if element could not be found within time
         """
+        LOG.info(
+            f"web_find called from {inspect.stack()[1].function} "
+            f"with selector_type={selector_type}, value={selector_value}, timeout={timeout}"
+)
         match selector_type:
             case By.ID:
                 escaped_id = selector_value.translate(METACHAR_ESCAPER)
                 return await self.web_await(
-                    lambda: self.page.query_selector(f"#{escaped_id}", parent),
-                    timeout = timeout,
-                    timeout_error_message = f"No HTML element found with ID '{selector_value}' within {timeout} seconds.")
+                lambda: self.page.query_selector(f"#{escaped_id}"),
+                timeout=timeout,                
+                timeout_error_message = f"No HTML element found with ID '{selector_value}' within timeout3: {timeout} seconds.")
             case By.CLASS_NAME:
                 escaped_classname = selector_value.translate(METACHAR_ESCAPER)
                 return await self.web_await(

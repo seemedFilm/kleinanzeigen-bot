@@ -637,12 +637,17 @@ class KleinanzeigenBot(WebScrapingMixin):
 
         try:
             LOG.info("Handling GDPR disclaimer...")
-            await self.web_find(By.ID, "gdpr-banner-accept", timeout = 10)
-            await self.web_click(By.ID, "gdpr-banner-cmp-button")
+            tt = 10
+            LOG.info(f"handle_after_login_logic, timeout set to {tt}")
+            res = await self.web_find(By.ID, "gdpr-banner-accept", timeout=tt)
+            LOG.info(f"GDPR gdpr-banner-accept element found: {res}")
+            res = await self.web_click(By.ID, "gdpr-banner-cmp-button")
+            LOG.info(f"GDPR gdpr-banner-cmp-button element found: {res}")
             await self.web_click(By.XPATH, "//div[@id='ConsentManagementPage']//*//button//*[contains(., 'Alle ablehnen und fortfahren')]", timeout = 10)
         except TimeoutError:
             pass
 
+#pl
     async def is_logged_in(self) -> bool:
         try:
             # Try to find the standard element first
@@ -1358,6 +1363,7 @@ def main(args:list[str]) -> None:
                                                    |___/
                                  https://github.com/Second-Hand-Friends/kleinanzeigen-bot
                                  Version: {__version__}
+                                 BuildDate: {os.getenv("BUILD_DATE", "unknown")}
         """)[1:], flush = True)  # [1:] removes the first empty blank line
 
     loggers.configure_console_logging()

@@ -45,6 +45,21 @@ RUN <<EOF
 
 EOF
 
+# install X11
+RUN apt-get update && apt-get install -y \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    novnc \
+    websockify \
+    nano \
+    xterm \
+    lxterminal \
+    xfce4-terminal \
+ && rm -rf /var/lib/apt/lists/*
+
+
+
 ######################
 # build image
 ######################
@@ -136,15 +151,12 @@ ENV LOGGING_ENABLE="TRUE"
 ENV INIT_SH_FILE='' \
     CONFIG_FILE=/mnt/data/config.yaml
 
-# ---- Entry Point ----
-
 RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
 RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
 RUN bash
 
 
 COPY docker/image/run.sh /opt/run.sh
-#copy chromium start script and make it executable
 COPY docker/image/start_chromium.sh /opt/start_chromium.sh
 RUN chmod +x /opt/start_chromium.sh
 
@@ -154,7 +166,14 @@ VOLUME /mnt/data/ads
 VOLUME /mnt/data/ads/pics
 VOLUME /mnt/data/cache
 
-ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["\
+  Xvfb :0 -screen 0 1280x800x16 & \
+  fluxbox & \
+  x11vnc -display :0 -nopw -forever -rfbport 5900 & \
+  websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
+  tail -f /dev/null \
+"]
 
 
 
