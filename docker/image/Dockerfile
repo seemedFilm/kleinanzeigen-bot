@@ -54,8 +54,6 @@ RUN apt-get update && apt-get install -y \
     websockify \
     nano \
     xterm \
-    lxterminal \
-    xfce4-terminal \
  && rm -rf /var/lib/apt/lists/*
 
 
@@ -172,6 +170,7 @@ CMD ["\
   fluxbox & \
   x11vnc -display :0 -nopw -forever -rfbport 5900 & \
   websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
+  xterm -geometry 120x40+10+10 -fa Monospace -fs 10 & \
   tail -f /dev/null \
 "]
 
