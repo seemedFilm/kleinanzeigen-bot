@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y \
     websockify \
     nano \
     xterm \
+    xfonts-base \
  && rm -rf /var/lib/apt/lists/*
 
 
@@ -167,8 +168,10 @@ VOLUME /mnt/data/cache
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["\
   Xvfb :0 -screen 0 1280x800x16 & \
+  sleep 2 && \
   fluxbox & \
   x11vnc -display :0 -nopw -forever -rfbport 5900 & \
+  ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
   websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
   xterm -geometry 120x40+10+10 -fa Monospace -fs 10 & \
   tail -f /dev/null \

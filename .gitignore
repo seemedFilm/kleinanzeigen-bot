@@ -37,7 +37,10 @@ __pycache__
 /*.iws
 
 # Visual Studio Code
-/.vscode
+.vscode
+
+# Github
+.github
 
 # OSX
 .DS_Store
