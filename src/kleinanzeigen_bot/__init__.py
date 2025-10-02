@@ -1358,7 +1358,6 @@ def main(args:list[str]) -> None:
                                                    |___/
                                  https://github.com/Second-Hand-Friends/kleinanzeigen-bot
                                  Version: {__version__}
-                                 BuildDate: {os.getenv("BUILD_DATE", "unknown")}
         """)[1:], flush = True)  # [1:] removes the first empty blank line
 
     loggers.configure_console_logging()
