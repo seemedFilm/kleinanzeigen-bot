@@ -3,14 +3,16 @@ echo "Deleting old chromium locks..."
 rm -rf /mnt/data/cache/Single*
 echo "Finished deleting old chromium locks."
 
-
+echo "Checking cache location"
 if [ ! -d "/mnt/data/cache" ]; then
     echo "ERROR: cache mount missing at /mnt/data/cache"
     echo "Please create and mount a volume at /mnt/data/cache"
     echo "Exiting!"
     exit 1
 fi
+echo "Checking Logging environment"
 if [ "$LOGGING_ENABLE" = "TRUE" ]; then
+  echo "Logging to file active"
   LOGFILE="/mnt/data/logs/chromium.log"
   exec >/dev/null 2>>"$LOGFILE"
    /usr/bin/chromium \
@@ -19,8 +21,8 @@ if [ "$LOGGING_ENABLE" = "TRUE" ]; then
   --disable-dev-shm-usage \
   --disable-gpu \
   --remote-debugging-port=9222 \
-  --user-data-dir=/mnt/data/cachetmp \
-  about:blank \
+  --user-data-dir=/mnt/data/cache \
+  about:blank &
 
 else
     echo "INFO: Log to file deactivated"
@@ -46,7 +48,7 @@ fi
   --disable-dev-shm-usage \
   --disable-gpu \
   --remote-debugging-port=9222 \
-  --user-data-dir="$KLEINBOTCACHE" \
+  --user-data-dir=/mnt/data/cache \
   about:blank &
 
 # PID speichern (optional)

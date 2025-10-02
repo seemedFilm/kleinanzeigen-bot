@@ -35,7 +35,7 @@ cp -f "$project_root/.gitignore" "$project_root/.dockerignore"
 
 
 #################################################
-# specify target docker registry/repo
+# specify target docker registry/repoy
 #################################################
 #image_repo=second-hand-friends/kleinanzeigen-bot
 image_repo=kleinbot
@@ -47,6 +47,7 @@ image_name=$image_repo:cookie
 #################################################
 echo "Building docker image [$image_name] from [$project_root]..."
 docker image pull python:3-slim || true # ensure we have the latest version of the base image
+echo " imagename: ${image_repo}"
 
 if [[ $OSTYPE == "cygwin" || $OSTYPE == "msys" ]]; then
    project_root=$(cygpath -w "$project_root")
