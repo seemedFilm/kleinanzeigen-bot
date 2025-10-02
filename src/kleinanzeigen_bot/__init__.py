@@ -1319,7 +1319,8 @@ class KleinanzeigenBot(WebScrapingMixin):
                 or ""  # Default to empty string if all sources are None
             )
 
-            # Combine the parts and replace @ with (at)
+
+            # Combine the parts and replace @ with (at) 
             final_description = str(prefix) + str(description_text) + str(suffix)
             final_description = final_description.replace("@", "(at)")
         else:
