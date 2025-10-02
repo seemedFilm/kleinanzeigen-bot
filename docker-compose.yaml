@@ -7,13 +7,8 @@ services:
       - DISPLAY=:0
       - KLEINBOT_NAME=kleinbot
       - LOGGING_ENABLE=TRUE
-      - KLEINBOT_LOGS=/mnt/data/logs
-      - KLEINBOT_DATA=/mnt/data
-      - TEST=True
       - KLEINBOT_COOKIE=/mnt/data/kleinanzeigen_cookies.json
       - KLEINBOT_CACHE=/mnt/data/cache
-      - SHARED_ADS=/mnt/data/ads
-      - SHARED_PIC=/mnt/data/ads/pics
     volumes:
       - /docker/klein/shared/ads:/mnt/data/ads:rw
       - /docker/klein/shared/ads/pics:/mnt/data/ads/pics:rw
