@@ -637,12 +637,8 @@ class KleinanzeigenBot(WebScrapingMixin):
 
         try:
             LOG.info("Handling GDPR disclaimer...")
-            tt = 10
-            LOG.info(f"handle_after_login_logic, timeout set to {tt}")
-            res = await self.web_find(By.ID, "gdpr-banner-accept", timeout=tt)
-            LOG.info(f"GDPR gdpr-banner-accept element found: {res}")
-            res = await self.web_click(By.ID, "gdpr-banner-cmp-button")
-            LOG.info(f"GDPR gdpr-banner-cmp-button element found: {res}")
+            await self.web_find(By.ID, "gdpr-banner-accept", timeout=10)
+            await self.web_click(By.ID, "gdpr-banner-cmp-button")
             await self.web_click(By.XPATH, "//div[@id='ConsentManagementPage']//*//button//*[contains(., 'Alle ablehnen und fortfahren')]", timeout = 10)
         except TimeoutError:
             pass
@@ -1318,7 +1314,6 @@ class KleinanzeigenBot(WebScrapingMixin):
                 else self.config.ad_defaults.description_suffix
                 or ""  # Default to empty string if all sources are None
             )
-
 
             # Combine the parts and replace @ with (at) 
             final_description = str(prefix) + str(description_text) + str(suffix)
