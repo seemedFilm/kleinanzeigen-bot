@@ -637,13 +637,12 @@ class KleinanzeigenBot(WebScrapingMixin):
 
         try:
             LOG.info("Handling GDPR disclaimer...")
-            await self.web_find(By.ID, "gdpr-banner-accept", timeout=10)
+            await self.web_find(By.ID, "gdpr-banner-accept", timeout = 10)
             await self.web_click(By.ID, "gdpr-banner-cmp-button")
             await self.web_click(By.XPATH, "//div[@id='ConsentManagementPage']//*//button//*[contains(., 'Alle ablehnen und fortfahren')]", timeout = 10)
         except TimeoutError:
             pass
 
-#pl
     async def is_logged_in(self) -> bool:
         try:
             # Try to find the standard element first
