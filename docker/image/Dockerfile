@@ -32,6 +32,7 @@ RUN <<EOF
   echo "Installing Chromium... & pwuser for starting chromium as non-root user"
   echo "#################################################"
   apt-get install --no-install-recommends -y chromium
+  apt-get install --no-install-recommends -y nano
 
   apt-get clean autoclean
   apt-get autoremove --purge -y
@@ -107,7 +108,7 @@ ARG BUILD_DATE
 ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
-ARG KLEINBOT_COOKIE
+#ARG KLEINBOT_COOKIE
 
 # ---- Labels für Metadaten ----
 LABEL maintainer="Sebastian Thomschke" \
@@ -124,12 +125,13 @@ LABEL maintainer="Sebastian Thomschke" \
 ENV PYTHONUNBUFFERED=1
 ENV DISPLAY=":0"
 ENV X11_DISPLAY=":0"
-ENV KLEINBOT_NAME="kleinbot"
 
-ENV KLEINBOT_CACHE="/klein/bot/cache"
-ENV KLEINBOT_DATA="/klein/bot/data"
-ENV KLEINBOT_COOKIE=""
-ENV LOGGING_ENABLE="TRUE"
+#ENV KLEINBOT_NAME="kleinbot"
+ENV TZ="America/New_York"
+#ENV KLEINBOT_CACHE="/klein/bot/cache"
+#ENV KLEINBOT_DATA="/klein/bot/data"
+#ENV KLEINBOT_COOKIE=""
+#ENV LOGGING_ENABLE="TRUE"
 # ---- Default Configs ----
 ENV INIT_SH_FILE='' \
     CONFIG_FILE=/mnt/data/config.yaml
@@ -142,17 +144,18 @@ RUN bash
 
 
 COPY docker/image/run.sh /opt/run.sh
-#copy chromium start script and make it executable
 COPY docker/image/start_chromium.sh /opt/start_chromium.sh
 RUN chmod +x /opt/start_chromium.sh
 
 
 VOLUME /mnt/data
-#VOLUME /mnt/data/ads
-#VOLUME /mnt/data/ads/pics
-#VOLUME /mnt/data/cache
+VOLUME /mnt/data/ads
+VOLUME /mnt/data/ads/pics
+VOLUME /mnt/data/cache
 
 ENTRYPOINT ["/bin/bash", "/opt/run.sh"]
+
+# ENTRYPOINT ["/bin/bash"]
 
 
 

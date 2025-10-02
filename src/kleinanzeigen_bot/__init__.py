@@ -24,6 +24,8 @@ from .utils.misc import ainput, ensure, is_frozen
 from .utils.web_scraping_mixin import By, Element, Is, WebScrapingMixin
 from kleinanzeigen_bot.utils.cookies import import_cookies_into_page
 
+from datetime import datetime
+
 
 # W0406: possibly a bug, see https://github.com/PyCQA/pylint/issues/3933
 
@@ -1358,6 +1360,7 @@ def main(args:list[str]) -> None:
                                                    |___/
                                  https://github.com/Second-Hand-Friends/kleinanzeigen-bot
                                  Version: {__version__}
+                                 Time: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         """)[1:], flush = True)  # [1:] removes the first empty blank line
 
     loggers.configure_console_logging()

@@ -4,9 +4,7 @@ services:
     container_name: kleinbot
     shm_size: "1g"
     environment:
-      - DISPLAY::0
       - LOGGING_ENABLE:TRUE
-      - KLEINBOT_COOKIE:/mnt/data/kleinanzeigen_cookies.json
     volumes:
       - /docker/klein/bot/cache:/mnt/data/cache:rw
       - /docker/klein/shared/ads:/mnt/data/ads:rw
