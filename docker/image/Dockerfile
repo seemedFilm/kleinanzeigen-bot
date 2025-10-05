@@ -152,6 +152,7 @@ ENV INIT_SH_FILE='' \
 
 RUN echo 'alias ll="ls -alF"' >> ~/.bashrc
 RUN echo 'alias ll="ls -alF"' >> /home/pwuser/.bashrc
+RUN echo 'alias start="./opt/run.sh publish"'>> ~/.bashrc
 RUN bash
 
 
