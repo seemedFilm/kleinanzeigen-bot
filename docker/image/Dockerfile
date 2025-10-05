@@ -158,6 +158,8 @@ RUN bash
 COPY docker/image/run.sh /opt/run.sh
 COPY docker/image/start_chromium.sh /opt/start_chromium.sh
 RUN chmod +x /opt/start_chromium.sh
+#changed for debug purposes
+RUN chmod +x /opt/run.sh 
 
 
 VOLUME /mnt/data
@@ -166,6 +168,7 @@ VOLUME /mnt/data/ads/pics
 VOLUME /mnt/data/cache
 
 ENTRYPOINT ["/bin/bash", "-c"]
+
 CMD ["\
   Xvfb :0 -screen 0 1280x800x16 & \
   sleep 2 && \
@@ -173,7 +176,8 @@ CMD ["\
   x11vnc -display :0 -nopw -forever -rfbport 5900 & \
   ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
   websockify --web=/usr/share/novnc/ 6080 localhost:5900 & \
-  xterm -geometry 120x40+10+10 -fa Monospace -fs 10 & \
+  until xdpyinfo -display :0 >/dev/null 2>&1; do echo 'Warte auf Xvfb...'; sleep 1; done && \
+  xterm -display :0 -geometry 120x40+10+10 -fa Monospace -fs 10 & \
   tail -f /dev/null \
 "]
 

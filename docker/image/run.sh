@@ -21,4 +21,7 @@ fi
 cd /mnt/data
 
 /opt/start_chromium.sh
-/opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"
+
+#changed for debug purpose
+/opt/kleinanzeigen-bot --config /mnt/data/config.yaml "$@"
+#/opt/kleinanzeigen-bot --config $CONFIG_FILE "$@"

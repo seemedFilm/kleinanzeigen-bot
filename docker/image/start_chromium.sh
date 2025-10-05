@@ -10,17 +10,18 @@ if [ ! -d "/mnt/data/cache" ]; then
     echo "Exiting!"
     exit 1
 fi
+#  --headless=new \
+
 if [ "$LOGGING_ENABLE" = "TRUE" ]; then
   LOGFILE="/mnt/data/logs/chromium.log"
   exec >/dev/null 2>>"$LOGFILE"
    /usr/bin/chromium \
-  --headless=new \
   --no-sandbox \
   --disable-dev-shm-usage \
   --disable-gpu \
   --remote-debugging-port=9222 \
-  --user-data-dir=/mnt/data/cachetmp \
-  about:blank \
+  --user-data-dir=/mnt/data/cache \
+  about:blank &
 
 else
     echo "INFO: Log to file deactivated"
