@@ -377,7 +377,7 @@ class KleinanzeigenBot(WebScrapingMixin):
 
         config_yaml = dicts.load_dict_if_exists(self.config_file_path, _("config"))
         self.config = Config.model_validate(config_yaml, strict = True, context = self.config_file_path)
-
+             
         # load built-in category mappings
         self.categories = dicts.load_dict_from_module(resources, "categories.yaml", "categories")
         deprecated_categories = dicts.load_dict_from_module(resources, "categories_old.yaml", "categories")
@@ -391,9 +391,16 @@ class KleinanzeigenBot(WebScrapingMixin):
         self.browser_config.binary_location = self.config.browser.binary_location
         self.browser_config.extensions = [abspath(item, relative_to = self.config_file_path) for item in self.config.browser.extensions]
         self.browser_config.use_private_window = self.config.browser.use_private_window
+        print("")
+        print(f"self.config.browser.user_data_dir: {self.config.browser.user_data_dir}")
+        print("")
         if self.config.browser.user_data_dir:
             self.browser_config.user_data_dir = abspath(self.config.browser.user_data_dir, relative_to = self.config_file_path)
         self.browser_config.profile_name = self.config.browser.profile_name
+
+        print("")
+        print(f"self.config.browser.user_data_dir: {self.config.browser.user_data_dir}")
+        print("")
 
     def __check_ad_republication(self, ad_cfg:Ad, ad_file_relative:str) -> bool:
         """
