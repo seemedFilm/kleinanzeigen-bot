@@ -22,7 +22,7 @@ from .utils.files import abspath
 from .utils.i18n import Locale, get_current_locale, pluralize, set_current_locale
 from .utils.misc import ainput, ensure, is_frozen
 from .utils.web_scraping_mixin import By, Element, Is, WebScrapingMixin
-from kleinanzeigen_bot.utils.cookies import import_cookies_into_page
+from kleinanzeigen_bot.utils.cookies import import_cookies_and_localstorage
 
 
 # W0406: possibly a bug, see https://github.com/PyCQA/pylint/issues/3933

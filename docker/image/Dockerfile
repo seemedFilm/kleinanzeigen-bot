@@ -58,7 +58,6 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 
-
 ######################
 # build image
 ######################
@@ -122,6 +121,7 @@ ARG GIT_COMMIT_HASH
 ARG GIT_COMMIT_DATE
 ARG GIT_REPO_URL
 ARG KLEINBOT_COOKIE
+ARG KLEINBOT_STORAGE
 
 # ---- Labels für Metadaten ----
 LABEL maintainer="Sebastian Thomschke" \
@@ -142,6 +142,7 @@ ENV KLEINBOT_NAME="kleinbot"
 ENV KLEINBOT_LOGS="/klein/bot/data/logs"
 ENV KLEINBOT_DATA="/klein/bot/data"
 ENV KLEINBOT_COOKIE="/klein/bot/data/kleinanzeigen_cookies.json"
+ENV KLEINBOT_STORAGE="/mnt/data/kleinanzeigen_localstorage.json"
 ENV SHARED_ADS="/klein/shared/ads"
 ENV SHARED_PIC="/klein/shared/pics"
 ENV LOGGING_ENABLE="TRUE"
@@ -160,6 +161,7 @@ COPY docker/image/start_chromium.sh /opt/start_chromium.sh
 RUN chmod +x /opt/start_chromium.sh
 #changed for debug purposes
 RUN chmod +x /opt/run.sh 
+
 
 
 VOLUME /mnt/data

@@ -1,6 +1,6 @@
 services:
   kleinbot:
-    image: kleinbot:X11
+    image: kleinbot:cookie
     container_name: kleinbot
     shm_size: 1g
     environment:
@@ -8,6 +8,7 @@ services:
       - KLEINBOT_NAME=kleinbot
       - LOGGING_ENABLE=TRUE
       - KLEINBOT_COOKIE=/mnt/data/kleinanzeigen_cookies.json
+      - KLEINBOT_STORAGE=/mnt/data/kleinanzeigen_localstorage.json
     volumes:
       - /docker/klein/shared/ads:/mnt/data/ads:rw
       - /docker/klein/shared/ads/pics:/mnt/data/ads/pics:rw

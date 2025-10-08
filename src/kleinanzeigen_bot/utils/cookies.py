@@ -6,8 +6,13 @@ import traceback
 
 LOG = logging.getLogger(__name__)
 
-async def import_cookies_into_page(browser, page):
+async def import_cookies_and_localstorage(browser, page):
     cookie_file = os.environ.get("KLEINBOT_COOKIE")
+    storage_file = os.environ.get("KLEINBOT_STORAGE")
+    print("")
+    print(f"{cookie_file}")
+    print(f"{storage_file}")
+    print()
     if not cookie_file or not os.path.exists(cookie_file):
         LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden, normaler Login wird verwendet.")
         return
@@ -41,82 +46,35 @@ async def import_cookies_into_page(browser, page):
         if params:
             await browser.cookies.set_all(cookies=params)
             LOG.info("Cookies erfolgreich importiert (%d Stück).", len(params))
-
-        await page.reload()
+        else:
+            LOG.warning("Keine gültigen Cookies gefunden.")
     except Exception as e:
         LOG.error("Fehler beim Import der Cookies: %s", e)
-        raise
-    
-# async def import_cookies_into_page(page):
-#     cookie_file = os.environ.get("KLEINBOT_COOKIE")
-#     if not cookie_file or not os.path.exists(cookie_file):
-#         LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden – normaler Login wird verwendet.")
-#         return
+    else:
+        LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden - überspringe Cookie-Import.")
 
-#     LOG.info("Lade Cookies aus: %s", cookie_file)
-#     try:
-#         with open(cookie_file, "r", encoding="utf-8") as f:
-#             cookies = json.load(f)
+ # ---- LOCAL STORAGE -----------------------------------------------------
+    if storage_file and os.path.exists(storage_file):
+        LOG.info("Lade LocalStorage aus: %s", storage_file)
+        try:
+            with open(storage_file, "r", encoding="utf-8") as f:
+                storage_items = json.load(f)
 
-#         for cookie in cookies:
-#             try:
-#                 await page.set_cookie(cookie)
-#             except Exception as e:
-#                 LOG.warning("Cookie %s konnte nicht gesetzt werden: %s", cookie.get("name"), e)
+            # LocalStorage-Schlüssel/Werte ins aktuelle Tab-Skript schreiben
+            for key, value in storage_items.items():
+                try:
+                    # Werte sicher escapen (f für JS-String)
+                    js = f"localStorage.setItem({json.dumps(key)}, {json.dumps(value)});"
+                    await page.evaluate(js)
+                except Exception as e:
+                    LOG.warning("LocalStorage-Eintrag %s übersprungen: %s", key, e)
 
-#         await page.reload()
-#         LOG.info("Cookies erfolgreich importiert.")
-#     except Exception as e:
-#         LOG.error("Fehler beim Import der Cookies: %s", e)
-#         traceback.print_exc()
-        
-# async def import_cookies_into_page(page):
-#     cookie_file = os.environ.get("KLEINBOT_COOKIE")
-#     if not cookie_file or not os.path.exists(cookie_file):
-#         LOG.error(f"Keine Cookie-Datei gesetzt oder Datei nicht gefunden - normaler Login wird verwendet.")
-#         return
-#     LOG.info(f"Lade Cookies aus: {cookie_file}")
-#     try:
-#         with open(cookie_file, "r", encoding="utf-8") as f:
-#             cookies = json.load(f)
+            LOG.info("LocalStorage erfolgreich importiert (%d Einträge).", len(storage_items))
+        except Exception as e:
+            LOG.error("Fehler beim Import des LocalStorage: %s", e)
+    else:
+        LOG.info("Keine LocalStorage-Datei gesetzt oder Datei nicht gefunden - überspringe LocalStorage-Import.")
 
-#         await page.wait_loaded()
-#         for cookie in cookies:
-#             try:
-#                 await page.set_cookie(cookie)
-#             except Exception as e:
-#                 LOG.error(f"Cookie %s konnte nicht gesetzt werden: %s", cookie.get("name"), e)
-
-#         await page.reload()
-#         LOG.info(f"Cookies erfolgreich importiert.")
-#     except Exception as e:
-#         LOG.error(f"Fehler beim Import der Cookies: {e}")
-
-
-# async def import_cookies(browser, cookie_file: str):
-#     """
-#     Importiert Cookies aus einer JSON-Datei und injiziert sie in den nodriver Browser.
-#     """
-#     if not os.path.exists(cookie_file):
-#         print(f"[WARN] Cookie-Datei {cookie_file} nicht gefunden – überspringe Import.")
-#         return
-
-#     with open(cookie_file, "r", encoding="utf-8") as f:
-#         cookies = json.load(f)
-
-#     # Cookies können aus Chrome/Export anders aussehen → Mapping anpassen
-#     for cookie in cookies:
-#         try:
-#             await browser.set_cookie(                
-#                 domain=cookie.get("domain", ".kleinanzeigen.de"),
-#                 name=cookie["name"],
-#                 value=cookie["value"],
-#                 path=cookie.get("path", "/"),                
-#                 expires=cookie.get("expiry"),  # Can be none
-#                 sameSite=cookie.get("sameSite", "Lax"),
-#                 secure=cookie.get("secure", True),
-#                 httpOnly=cookie.get("httpOnly", False)
-#             )
-#             print(f"[INFO]set {cookie.get('name')}")
-#         except Exception as ex:
-#             print(f"[WARN] Couldn't set {cookie.get('name')} nicht setzen: {ex}")
+    # Seite neu laden, damit alles aktiv wird
+    await page.reload()
+    LOG.info("Cookies und LocalStorage importiert und Seite neu geladen.")
