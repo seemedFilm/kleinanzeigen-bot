@@ -2,19 +2,17 @@ import os
 import json
 import logging
 from nodriver.cdp.network import CookieParam
-import traceback
 
 LOG = logging.getLogger(__name__)
 
 async def import_cookies_and_localstorage(browser, page):
     cookie_file = os.environ.get("KLEINBOT_COOKIE")
     storage_file = os.environ.get("KLEINBOT_STORAGE")
-    print("")
-    print(f"{cookie_file}")
-    print(f"{storage_file}")
-    print()
     if not cookie_file or not os.path.exists(cookie_file):
         LOG.info("Keine Cookie-Datei gesetzt oder Datei nicht gefunden, normaler Login wird verwendet.")
+        return
+    if not storage_file or not os.path.exists(storage_file):
+        LOG.info("Keine Storage-Datei gesetzt oder Datei nicht gefunden, normaler Login wird verwendet.")
         return
 
     LOG.info("Lade Cookies aus: %s", cookie_file)
